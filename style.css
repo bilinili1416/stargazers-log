@@ -63,6 +63,24 @@ h1 span {
   font-size: 1.05rem;
 }
 
+.intro-source {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.intro-source a {
+  color: var(--green);
+  font-weight: 700;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+}
+
+.intro-source a:hover,
+.intro-source a:focus-visible {
+  text-decoration-color: currentColor;
+}
+
 .repository-section {
   padding: 34px 0 48px;
 }
@@ -86,6 +104,53 @@ h1 span {
   margin-bottom: 0;
   color: var(--muted);
   font-size: 0.875rem;
+}
+
+.collection-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin: 18px 0 26px;
+}
+
+.collection-tools[hidden] {
+  display: none;
+}
+
+.tool {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tool-search {
+  flex: 1 1 240px;
+}
+
+.tool-label {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.collection-tools input,
+.collection-tools select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #ffffff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.collection-tools input:focus,
+.collection-tools select:focus {
+  border-color: var(--green);
+  outline: 2px solid var(--soft-green);
 }
 
 .repository-list {

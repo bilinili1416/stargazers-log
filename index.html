@@ -13,6 +13,7 @@
         <p class="eyebrow">OPEN SOURCE / BOOKMARKS</p>
         <h1>Starred repositories<span>.</span></h1>
         <p class="intro">A running log of projects worth keeping close.</p>
+        <p class="intro-source" id="profile-line" hidden></p>
       </header>
 
       <section class="repository-section" aria-labelledby="list-heading">
@@ -20,6 +21,31 @@
           <h2 id="list-heading">The collection</h2>
           <p id="repository-count" class="repository-count" aria-live="polite">Loading...</p>
         </div>
+
+        <form class="collection-tools" id="collection-tools" hidden>
+          <label class="tool tool-search">
+            <span class="tool-label">Search</span>
+            <input id="search" type="search" placeholder="Name, description or language"
+              autocomplete="off">
+          </label>
+          <label class="tool">
+            <span class="tool-label">Language</span>
+            <select id="language">
+              <option value="">All languages</option>
+            </select>
+          </label>
+          <label class="tool">
+            <span class="tool-label">Sort</span>
+            <select id="sort">
+              <option value="starred-desc">Recently starred</option>
+              <option value="starred-asc">Earliest starred</option>
+              <option value="stars-desc">Most stars</option>
+              <option value="updated-desc">Recently updated</option>
+              <option value="name-asc">Name (A–Z)</option>
+            </select>
+          </label>
+        </form>
+
         <ol id="repository-list" class="repository-list" aria-live="polite">
           <li class="list-message">Loading starred repositories...</li>
         </ol>
