@@ -17,6 +17,7 @@
 | `index.html` | 页面结构 |
 | `style.css` | 样式 |
 | `script.js` | 获取 star 过的仓库并渲染列表 |
+| `tools/star-repos.mjs` | 把另一个账号的 star 复制到你自己账号（见下文） |
 | `.github/workflows/deploy.yml` | 每次推送到 `main` 时把页面发布到 GitHub Pages |
 
 ## 使用方法
@@ -46,6 +47,28 @@ const DEFAULT_USER = "bilinili1416";
 ```
 https://your-page/?user=some-other-account
 ```
+
+## 复制别人的 star 列表
+
+`tools/star-repos.mjs` 会把另一个账号 star 过的仓库，全部 star 到你自己账号里。
+star 属于写入操作，所以它需要一个 token。
+
+1. 创建一个 fine-grained token：账号权限里勾选 **Starring: Read and write**，
+   仓库权限里勾选 **Metadata: Read-only**。使用带 `public_repo` 权限的 classic
+   token 也可以。
+2. 把它保存到 `tools/.star-token`（该文件已被 git 忽略），或者设置
+   `GITHUB_TOKEN`。
+3. 先预演，再执行：
+
+```bash
+node tools/star-repos.mjs --from PKUFlyingPig
+node tools/star-repos.mjs --from PKUFlyingPig --apply
+```
+
+你已经 star 过的仓库会被跳过。每次运行都会写一个日志文件，`--undo <logfile>`
+会精确撤销该次运行添加的 star，不会影响你原本就有的 star。请求之间默认间隔
+一秒，所以 136 个新 star 大约需要两分半钟。star 是公开行为，因此批量操作会
+出现在关注者的动态里。
 
 ## API 说明
 

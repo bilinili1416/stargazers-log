@@ -1,0 +1,5 @@
+# Token used by tools/star-repos.mjs — never commit this.
+tools/.star-token
+
+# Records of what that tool starred, only useful on your own machine.
+tools/starred-*.json
