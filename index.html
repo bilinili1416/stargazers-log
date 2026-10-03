@@ -1,11 +1,611 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stargazers log</title>
+    <meta name="description" content="我收藏的 GitHub 仓库一览">
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --panel: #ffffff;
+        --border: #d8dee4;
+        --text: #1f2328;
+        --muted: #59636e;
+        --accent: #0969da;
+        --accent-soft: #ddf4ff;
+        --shadow: 0 1px 3px rgba(31, 35, 40, 0.08);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1117;
+          --panel: #151b23;
+          --border: #30363d;
+          --text: #f0f6fc;
+          --muted: #9198a1;
+          --accent: #4493f8;
+          --accent-soft: #121d2f;
+          --shadow: none;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0 20px 64px;
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC",
+          "PingFang SC", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+      }
+
+      header.site {
+        padding: 40px 0 24px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .identity {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        background: var(--panel);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 26px;
+        letter-spacing: -0.2px;
+      }
+
+      .subtitle {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .subtitle a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .subtitle a:hover {
+        text-decoration: underline;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        padding: 20px 0;
+      }
+
+      .search {
+        flex: 1 1 240px;
+        min-width: 200px;
+      }
+
+      input[type="search"],
+      select {
+        width: 100%;
+        padding: 8px 12px;
+        font: inherit;
+        color: var(--text);
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      select {
+        width: auto;
+        min-width: 150px;
+      }
+
+      input[type="search"]:focus,
+      select:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: -1px;
+        border-color: transparent;
+      }
+
+      .count {
+        margin-left: auto;
+        color: var(--muted);
+        font-size: 14px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 18px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+      }
+
+      .card h2 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.4;
+        word-break: break-word;
+      }
+
+      .card h2 a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .card h2 a:hover {
+        text-decoration: underline;
+      }
+
+      .card h2 .owner {
+        color: var(--muted);
+        font-weight: 400;
+      }
+
+      .desc {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        flex: 1;
+      }
+
+      .topics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .topic {
+        padding: 1px 9px;
+        font-size: 12px;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border-radius: 999px;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        color: var(--muted);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--muted);
+      }
+
+      .starred-at {
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .state {
+        padding: 48px 0;
+        text-align: center;
+        color: var(--muted);
+      }
+
+      .state strong {
+        display: block;
+        color: var(--text);
+        font-size: 17px;
+        margin-bottom: 6px;
+      }
+
+      .state a {
+        color: var(--accent);
+      }
+
+      .spinner {
+        width: 22px;
+        height: 22px;
+        margin: 0 auto 12px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .spinner {
+          animation-duration: 2.4s;
+        }
+      }
+
+      footer {
+        margin-top: 32px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Stargazers log</h1>
-    <p>A log of the repositories I've starred.</p>
+    <div class="wrap">
+      <header class="site">
+        <div class="identity">
+          <img id="avatar" class="avatar" alt="" hidden>
+          <div>
+            <h1>Stargazers log</h1>
+            <p class="subtitle" id="subtitle">正在读取 GitHub…</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="toolbar" hidden id="toolbar">
+        <div class="search">
+          <input id="search" type="search" placeholder="搜索仓库名、描述、语言或标签（按 / 聚焦）"
+            aria-label="搜索仓库">
+        </div>
+        <select id="language" aria-label="按语言筛选"></select>
+        <select id="sort" aria-label="排序方式">
+          <option value="starred-desc">最近收藏</option>
+          <option value="starred-asc">最早收藏</option>
+          <option value="stars-desc">Star 数最多</option>
+          <option value="updated-desc">最近更新</option>
+          <option value="name-asc">按名称</option>
+        </select>
+        <span class="count" id="count"></span>
+      </div>
+
+      <main>
+        <div class="state" id="state">
+          <div class="spinner"></div>
+          正在从 GitHub 读取你的 star 列表…
+        </div>
+        <div class="grid" id="grid"></div>
+      </main>
+
+      <footer>
+        数据实时来自 GitHub API · 页面由 <a id="repo-link" href="#">stargazers-log</a> 生成
+      </footer>
+    </div>
+
+    <script>
+      // ===== 配置 =====
+      // 想换成别的账号，改这里即可；也可以在网址后面加 ?user=某人 临时查看。
+      const DEFAULT_USER = "bilinili1416";
+
+      const params = new URLSearchParams(location.search);
+      const USERNAME = (params.get("user") || DEFAULT_USER).trim();
+      const API = "https://api.github.com";
+
+      const LANGUAGE_COLORS = {
+        JavaScript: "#f1e05a",
+        TypeScript: "#3178c6",
+        Python: "#3572A5",
+        Java: "#b07219",
+        "C++": "#f34b7d",
+        C: "#555555",
+        "C#": "#178600",
+        Go: "#00ADD8",
+        Rust: "#dea584",
+        Ruby: "#701516",
+        PHP: "#4F5D95",
+        Swift: "#F05138",
+        Kotlin: "#A97BFF",
+        Dart: "#00B4AB",
+        HTML: "#e34c26",
+        CSS: "#563d7c",
+        Shell: "#89e051",
+        PowerShell: "#012456",
+        Batchfile: "#C1F12E",
+        "Jupyter Notebook": "#DA5B0B",
+        Vue: "#41b883",
+        Lua: "#000080",
+      };
+
+      // ===== 元素 =====
+      const el = {
+        avatar: document.getElementById("avatar"),
+        subtitle: document.getElementById("subtitle"),
+        toolbar: document.getElementById("toolbar"),
+        search: document.getElementById("search"),
+        language: document.getElementById("language"),
+        sort: document.getElementById("sort"),
+        count: document.getElementById("count"),
+        state: document.getElementById("state"),
+        grid: document.getElementById("grid"),
+        repoLink: document.getElementById("repo-link"),
+      };
+
+      let allRepos = [];
+
+      // ===== 工具函数 =====
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (ch) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[ch]));
+      }
+
+      function formatNumber(n) {
+        return new Intl.NumberFormat("zh-CN").format(n);
+      }
+
+      function formatDate(iso) {
+        if (!iso) return "未知";
+        return new Intl.DateTimeFormat("zh-CN", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(new Date(iso));
+      }
+
+      function timeAgo(iso) {
+        if (!iso) return "未知";
+        const seconds = (Date.now() - new Date(iso).getTime()) / 1000;
+        const units = [
+          ["年", 31536000],
+          ["个月", 2592000],
+          ["天", 86400],
+          ["小时", 3600],
+          ["分钟", 60],
+        ];
+        for (const [label, size] of units) {
+          const value = Math.floor(seconds / size);
+          if (value >= 1) return `${value} ${label}前`;
+        }
+        return "刚刚";
+      }
+
+      function languageColor(language) {
+        return LANGUAGE_COLORS[language] || "#8b949e";
+      }
+
+      // ===== 数据获取 =====
+      // GitHub 的 /starred 接口每页最多 100 条，默认按“收藏时间”倒序。
+      // 这里逐页取完，最多取 10 页（1000 个仓库），足够个人使用。
+      async function fetchStarred(username) {
+        const perPage = 100;
+        const maxPages = 10;
+        const collected = [];
+
+        for (let page = 1; page <= maxPages; page++) {
+          const url = `${API}/users/${encodeURIComponent(username)}/starred` +
+            `?per_page=${perPage}&page=${page}`;
+          const res = await fetch(url, {
+            headers: {
+              Accept: "application/vnd.github.star+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+            },
+          });
+
+          if (!res.ok) throw await buildError(res, username);
+
+          const batch = await res.json();
+          for (const item of batch) {
+            collected.push({ starred_at: item.starred_at, repo: item.repo });
+          }
+          if (batch.length < perPage) break;
+        }
+
+        return collected;
+      }
+
+      async function buildError(res, username) {
+        if (res.status === 404) {
+          return new Error(`找不到 GitHub 用户「${username}」，请检查用户名是否写对。`);
+        }
+        if (res.status === 403 || res.status === 429) {
+          const reset = res.headers.get("X-RateLimit-Reset");
+          const when = reset
+            ? new Date(Number(reset) * 1000).toLocaleString("zh-CN")
+            : "稍后";
+          return new Error(
+            `GitHub 的匿名访问额度已用完（每小时 60 次）。额度将在 ${when} 重置，` +
+            "过一会儿刷新页面即可。"
+          );
+        }
+        return new Error(`读取失败：GitHub 返回了 ${res.status}。`);
+      }
+
+      // ===== 渲染 =====
+      function renderState({ title, detail = "", link = "" }) {
+        el.state.hidden = false;
+        el.state.innerHTML =
+          `<strong>${escapeHtml(title)}</strong>` +
+          (detail ? escapeHtml(detail) : "") +
+          (link ? `<div>${link}</div>` : "");
+      }
+
+      function renderCard(entry) {
+        const repo = entry.repo;
+        const [owner, name] = repo.full_name.split("/");
+        const topics = (repo.topics || []).slice(0, 5)
+          .map((t) => `<span class="topic">${escapeHtml(t)}</span>`).join("");
+
+        return `
+          <article class="card">
+            <h2>
+              <a href="${escapeHtml(repo.html_url)}" target="_blank" rel="noopener noreferrer">
+                <span class="owner">${escapeHtml(owner)}/</span>${escapeHtml(name)}
+              </a>
+            </h2>
+            <p class="desc">${escapeHtml(repo.description || "（这个仓库没有写描述）")}</p>
+            ${topics ? `<div class="topics">${topics}</div>` : ""}
+            <div class="meta">
+              ${repo.language
+                ? `<span><i class="dot" style="background:${languageColor(repo.language)}"></i>${escapeHtml(repo.language)}</span>`
+                : ""}
+              <span title="Star 数">★ ${formatNumber(repo.stargazers_count)}</span>
+              <span title="Fork 数">⑂ ${formatNumber(repo.forks_count)}</span>
+              <span title="最近更新">更新于 ${timeAgo(repo.pushed_at)}</span>
+            </div>
+            <div class="starred-at">收藏于 ${formatDate(entry.starred_at)}</div>
+          </article>`;
+      }
+
+      function applyFilters() {
+        const keyword = el.search.value.trim().toLowerCase();
+        const lang = el.language.value;
+
+        const list = allRepos.filter((entry) => {
+          const repo = entry.repo;
+          if (lang && (repo.language || "其他") !== lang) return false;
+          if (!keyword) return true;
+          const haystack = [
+            repo.full_name,
+            repo.description || "",
+            repo.language || "",
+            (repo.topics || []).join(" "),
+          ].join(" ").toLowerCase();
+          return haystack.includes(keyword);
+        });
+
+        const by = el.sort.value;
+        const time = (value) => new Date(value || 0).getTime();
+        list.sort((a, b) => {
+          switch (by) {
+            case "starred-asc":
+              return time(a.starred_at) - time(b.starred_at);
+            case "stars-desc":
+              return b.repo.stargazers_count - a.repo.stargazers_count;
+            case "updated-desc":
+              return time(b.repo.pushed_at) - time(a.repo.pushed_at);
+            case "name-asc":
+              return a.repo.full_name.localeCompare(b.repo.full_name, "en");
+            default:
+              return time(b.starred_at) - time(a.starred_at);
+          }
+        });
+
+        el.grid.innerHTML = list.map(renderCard).join("");
+        el.count.textContent = keyword || lang
+          ? `显示 ${formatNumber(list.length)} / ${formatNumber(allRepos.length)} 个`
+          : `共 ${formatNumber(allRepos.length)} 个仓库`;
+
+        if (list.length) {
+          el.state.hidden = true;
+        } else {
+          renderState({ title: "没有匹配的仓库", detail: "换个关键词或筛选条件试试。" });
+        }
+      }
+
+      function fillLanguageOptions() {
+        const counts = new Map();
+        for (const entry of allRepos) {
+          const key = entry.repo.language || "其他";
+          counts.set(key, (counts.get(key) || 0) + 1);
+        }
+        const options = [...counts.entries()]
+          .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "en"))
+          .map(([name, n]) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}（${n}）</option>`)
+          .join("");
+        el.language.innerHTML = `<option value="">全部语言</option>${options}`;
+      }
+
+      async function loadProfile() {
+        const res = await fetch(`${API}/users/${encodeURIComponent(USERNAME)}`, {
+          headers: { "X-GitHub-Api-Version": "2022-11-28" },
+        });
+        if (!res.ok) throw await buildError(res, USERNAME);
+        return res.json();
+      }
+
+      async function main() {
+        el.repoLink.href = `https://github.com/${USERNAME}/stargazers-log`;
+
+        try {
+          const [profile, starred] = await Promise.all([
+            loadProfile(),
+            fetchStarred(USERNAME),
+          ]);
+
+          allRepos = starred;
+
+          if (profile.avatar_url) {
+            el.avatar.src = profile.avatar_url;
+            el.avatar.alt = `${profile.login} 的头像`;
+            el.avatar.hidden = false;
+          }
+          el.subtitle.innerHTML = `${escapeHtml(profile.name || profile.login)} 收藏的仓库 · ` +
+            `<a href="https://github.com/${USERNAME}?tab=stars" target="_blank" rel="noopener noreferrer">在 GitHub 上查看</a>`;
+
+          if (!allRepos.length) {
+            renderState({
+              title: "还没有收藏任何仓库",
+              detail: "去 GitHub 点几个 star，再回来刷新页面。",
+            });
+            return;
+          }
+
+          el.toolbar.hidden = false;
+          fillLanguageOptions();
+          applyFilters();
+        } catch (error) {
+          renderState({
+            title: "无法读取 star 列表",
+            detail: error.message,
+            link: `<a href="https://github.com/${USERNAME}?tab=stars" target="_blank" rel="noopener noreferrer">先到 GitHub 上查看 →</a>`,
+          });
+        }
+      }
+
+      el.search.addEventListener("input", applyFilters);
+      el.language.addEventListener("change", applyFilters);
+      el.sort.addEventListener("change", applyFilters);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "/" && document.activeElement !== el.search) {
+          event.preventDefault();
+          el.search.focus();
+        }
+      });
+
+      main();
+    </script>
   </body>
 </html>
